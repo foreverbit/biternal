@@ -24,11 +24,11 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/ethereum/go-ethereum/accounts/keystore"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/console/prompt"
-	"github.com/ethereum/go-ethereum/p2p/dnsdisc"
-	"github.com/ethereum/go-ethereum/p2p/enode"
+	"github.com/foreverbit/biternal/accounts/keystore"
+	"github.com/foreverbit/biternal/common"
+	"github.com/foreverbit/biternal/console/prompt"
+	"github.com/foreverbit/biternal/p2p/dnsdisc"
+	"github.com/foreverbit/biternal/p2p/enode"
 	"github.com/urfave/cli/v2"
 )
 

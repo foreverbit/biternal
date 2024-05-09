@@ -21,13 +21,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ethereum/go-ethereum/consensus/ethash"
-	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/core/rawdb"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/light"
-	"github.com/ethereum/go-ethereum/p2p/enode"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/foreverbit/biternal/consensus/ethash"
+	"github.com/foreverbit/biternal/core"
+	"github.com/foreverbit/biternal/core/rawdb"
+	"github.com/foreverbit/biternal/core/types"
+	"github.com/foreverbit/biternal/light"
+	"github.com/foreverbit/biternal/p2p/enode"
+	"github.com/foreverbit/biternal/params"
 )
 
 // verifyImportEvent verifies that one single event arrive on an import channel.

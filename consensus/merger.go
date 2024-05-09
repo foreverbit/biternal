@@ -20,10 +20,10 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/ethereum/go-ethereum/core/rawdb"
-	"github.com/ethereum/go-ethereum/ethdb"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/foreverbit/biternal/core/rawdb"
+	"github.com/foreverbit/biternal/ethdb"
+	"github.com/foreverbit/biternal/log"
+	"github.com/foreverbit/biternal/rlp"
 )
 
 // transitionStatus describes the status of eth1/2 transition. This switch

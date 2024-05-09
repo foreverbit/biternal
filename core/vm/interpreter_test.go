@@ -21,11 +21,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/math"
-	"github.com/ethereum/go-ethereum/core/rawdb"
-	"github.com/ethereum/go-ethereum/core/state"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/foreverbit/biternal/common"
+	"github.com/foreverbit/biternal/common/math"
+	"github.com/foreverbit/biternal/core/rawdb"
+	"github.com/foreverbit/biternal/core/state"
+	"github.com/foreverbit/biternal/params"
 )
 
 var loopInterruptTests = []string{

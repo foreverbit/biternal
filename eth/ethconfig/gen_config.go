@@ -6,13 +6,13 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/consensus/ethash"
-	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/eth/downloader"
-	"github.com/ethereum/go-ethereum/eth/gasprice"
-	"github.com/ethereum/go-ethereum/miner"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/foreverbit/biternal/common"
+	"github.com/foreverbit/biternal/consensus/ethash"
+	"github.com/foreverbit/biternal/core"
+	"github.com/foreverbit/biternal/eth/downloader"
+	"github.com/foreverbit/biternal/eth/gasprice"
+	"github.com/foreverbit/biternal/miner"
+	"github.com/foreverbit/biternal/params"
 )
 
 // MarshalTOML marshals as TOML.

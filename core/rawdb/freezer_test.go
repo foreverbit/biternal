@@ -27,8 +27,8 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/ethereum/go-ethereum/ethdb"
-	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/foreverbit/biternal/ethdb"
+	"github.com/foreverbit/biternal/rlp"
 	"github.com/stretchr/testify/require"
 )
 

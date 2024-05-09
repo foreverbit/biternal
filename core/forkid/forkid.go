@@ -26,10 +26,10 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/foreverbit/biternal/common"
+	"github.com/foreverbit/biternal/core/types"
+	"github.com/foreverbit/biternal/log"
+	"github.com/foreverbit/biternal/params"
 )
 
 var (

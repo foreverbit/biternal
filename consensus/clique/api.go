@@ -20,12 +20,12 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/ethereum/go-ethereum/consensus"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/ethereum/go-ethereum/rpc"
+	"github.com/foreverbit/biternal/common"
+	"github.com/foreverbit/biternal/common/hexutil"
+	"github.com/foreverbit/biternal/consensus"
+	"github.com/foreverbit/biternal/core/types"
+	"github.com/foreverbit/biternal/rlp"
+	"github.com/foreverbit/biternal/rpc"
 )
 
 // API is a user facing RPC API to allow controlling the signer and voting

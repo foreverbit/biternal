@@ -19,7 +19,7 @@ package snapshot
 import (
 	"bytes"
 
-	"github.com/ethereum/go-ethereum/common"
+	"github.com/foreverbit/biternal/common"
 )
 
 // hashes is a helper to implement sort.Interface.

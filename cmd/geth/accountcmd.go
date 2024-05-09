@@ -20,11 +20,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ethereum/go-ethereum/accounts"
-	"github.com/ethereum/go-ethereum/accounts/keystore"
-	"github.com/ethereum/go-ethereum/cmd/utils"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/log"
+	"github.com/foreverbit/biternal/accounts"
+	"github.com/foreverbit/biternal/accounts/keystore"
+	"github.com/foreverbit/biternal/cmd/utils"
+	"github.com/foreverbit/biternal/crypto"
+	"github.com/foreverbit/biternal/log"
 	"github.com/urfave/cli/v2"
 )
 

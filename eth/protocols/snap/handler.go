@@ -21,15 +21,15 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/light"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/metrics"
-	"github.com/ethereum/go-ethereum/p2p"
-	"github.com/ethereum/go-ethereum/p2p/enode"
-	"github.com/ethereum/go-ethereum/p2p/enr"
-	"github.com/ethereum/go-ethereum/trie"
+	"github.com/foreverbit/biternal/common"
+	"github.com/foreverbit/biternal/core"
+	"github.com/foreverbit/biternal/light"
+	"github.com/foreverbit/biternal/log"
+	"github.com/foreverbit/biternal/metrics"
+	"github.com/foreverbit/biternal/p2p"
+	"github.com/foreverbit/biternal/p2p/enode"
+	"github.com/foreverbit/biternal/p2p/enr"
+	"github.com/foreverbit/biternal/trie"
 )
 
 const (

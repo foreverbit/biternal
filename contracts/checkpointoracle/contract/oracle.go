@@ -7,12 +7,12 @@ import (
 	"math/big"
 	"strings"
 
-	ethereum "github.com/ethereum/go-ethereum"
-	"github.com/ethereum/go-ethereum/accounts/abi"
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/event"
+	ethereum "github.com/foreverbit/biternal"
+	"github.com/foreverbit/biternal/accounts/abi"
+	"github.com/foreverbit/biternal/accounts/abi/bind"
+	"github.com/foreverbit/biternal/common"
+	"github.com/foreverbit/biternal/core/types"
+	"github.com/foreverbit/biternal/event"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.

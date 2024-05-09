@@ -22,9 +22,9 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/foreverbit/biternal/common"
+	"github.com/foreverbit/biternal/params"
+	"github.com/foreverbit/biternal/rlp"
 )
 
 // TestCreation tests that different genesis and fork rule combinations result in

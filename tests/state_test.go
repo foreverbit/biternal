@@ -27,11 +27,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/core/rawdb"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/core/vm"
-	"github.com/ethereum/go-ethereum/eth/tracers/logger"
+	"github.com/foreverbit/biternal/core"
+	"github.com/foreverbit/biternal/core/rawdb"
+	"github.com/foreverbit/biternal/core/types"
+	"github.com/foreverbit/biternal/core/vm"
+	"github.com/foreverbit/biternal/eth/tracers/logger"
 )
 
 func TestState(t *testing.T) {

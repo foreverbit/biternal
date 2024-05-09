@@ -26,12 +26,12 @@ import (
 	"time"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/ethereum/go-ethereum/common/mclock"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/internal/testlog"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/p2p/enode"
-	"github.com/ethereum/go-ethereum/p2p/enr"
+	"github.com/foreverbit/biternal/common/mclock"
+	"github.com/foreverbit/biternal/crypto"
+	"github.com/foreverbit/biternal/internal/testlog"
+	"github.com/foreverbit/biternal/log"
+	"github.com/foreverbit/biternal/p2p/enode"
+	"github.com/foreverbit/biternal/p2p/enr"
 )
 
 const (

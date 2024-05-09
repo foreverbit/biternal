@@ -26,13 +26,13 @@ import (
 	"time"
 
 	"github.com/VictoriaMetrics/fastcache"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/rawdb"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/ethdb"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/metrics"
-	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/foreverbit/biternal/common"
+	"github.com/foreverbit/biternal/core/rawdb"
+	"github.com/foreverbit/biternal/core/types"
+	"github.com/foreverbit/biternal/ethdb"
+	"github.com/foreverbit/biternal/log"
+	"github.com/foreverbit/biternal/metrics"
+	"github.com/foreverbit/biternal/rlp"
 )
 
 var (

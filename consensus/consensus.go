@@ -20,11 +20,11 @@ package consensus
 import (
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/state"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/rpc"
+	"github.com/foreverbit/biternal/common"
+	"github.com/foreverbit/biternal/core/state"
+	"github.com/foreverbit/biternal/core/types"
+	"github.com/foreverbit/biternal/params"
+	"github.com/foreverbit/biternal/rpc"
 )
 
 // ChainHeaderReader defines a small collection of methods needed to access the local

@@ -20,14 +20,14 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/consensus"
-	"github.com/ethereum/go-ethereum/consensus/misc"
-	"github.com/ethereum/go-ethereum/core/state"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/core/vm"
-	"github.com/ethereum/go-ethereum/ethdb"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/foreverbit/biternal/common"
+	"github.com/foreverbit/biternal/consensus"
+	"github.com/foreverbit/biternal/consensus/misc"
+	"github.com/foreverbit/biternal/core/state"
+	"github.com/foreverbit/biternal/core/types"
+	"github.com/foreverbit/biternal/core/vm"
+	"github.com/foreverbit/biternal/ethdb"
+	"github.com/foreverbit/biternal/params"
 )
 
 // BlockGen creates blocks for testing.

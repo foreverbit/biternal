@@ -23,13 +23,13 @@ import (
 	"io"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/accounts"
-	"github.com/ethereum/go-ethereum/accounts/external"
-	"github.com/ethereum/go-ethereum/accounts/keystore"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/log"
+	"github.com/foreverbit/biternal/accounts"
+	"github.com/foreverbit/biternal/accounts/external"
+	"github.com/foreverbit/biternal/accounts/keystore"
+	"github.com/foreverbit/biternal/common"
+	"github.com/foreverbit/biternal/core/types"
+	"github.com/foreverbit/biternal/crypto"
+	"github.com/foreverbit/biternal/log"
 )
 
 // ErrNoChainID is returned whenever the user failed to specify a chain id.

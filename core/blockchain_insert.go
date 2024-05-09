@@ -19,10 +19,10 @@ package core
 import (
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/mclock"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/log"
+	"github.com/foreverbit/biternal/common"
+	"github.com/foreverbit/biternal/common/mclock"
+	"github.com/foreverbit/biternal/core/types"
+	"github.com/foreverbit/biternal/log"
 )
 
 // insertStats tracks and reports on block insertion.

@@ -25,13 +25,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common/mclock"
-	"github.com/ethereum/go-ethereum/event"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/metrics"
-	"github.com/ethereum/go-ethereum/p2p/enode"
-	"github.com/ethereum/go-ethereum/p2p/enr"
-	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/foreverbit/biternal/common/mclock"
+	"github.com/foreverbit/biternal/event"
+	"github.com/foreverbit/biternal/log"
+	"github.com/foreverbit/biternal/metrics"
+	"github.com/foreverbit/biternal/p2p/enode"
+	"github.com/foreverbit/biternal/p2p/enr"
+	"github.com/foreverbit/biternal/rlp"
 )
 
 var (

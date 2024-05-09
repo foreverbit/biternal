@@ -22,10 +22,10 @@ import (
 	"io"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/forkid"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/foreverbit/biternal/common"
+	"github.com/foreverbit/biternal/core/forkid"
+	"github.com/foreverbit/biternal/core/types"
+	"github.com/foreverbit/biternal/rlp"
 )
 
 // Constants to match up protocol versions and messages

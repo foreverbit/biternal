@@ -22,14 +22,14 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/prque"
-	"github.com/ethereum/go-ethereum/consensus"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/eth/protocols/eth"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/metrics"
-	"github.com/ethereum/go-ethereum/trie"
+	"github.com/foreverbit/biternal/common"
+	"github.com/foreverbit/biternal/common/prque"
+	"github.com/foreverbit/biternal/consensus"
+	"github.com/foreverbit/biternal/core/types"
+	"github.com/foreverbit/biternal/eth/protocols/eth"
+	"github.com/foreverbit/biternal/log"
+	"github.com/foreverbit/biternal/metrics"
+	"github.com/foreverbit/biternal/trie"
 )
 
 const (

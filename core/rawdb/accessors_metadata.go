@@ -20,11 +20,11 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/ethdb"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/foreverbit/biternal/common"
+	"github.com/foreverbit/biternal/ethdb"
+	"github.com/foreverbit/biternal/log"
+	"github.com/foreverbit/biternal/params"
+	"github.com/foreverbit/biternal/rlp"
 )
 
 // ReadDatabaseVersion retrieves the version number of the database.

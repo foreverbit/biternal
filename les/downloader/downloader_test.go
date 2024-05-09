@@ -26,15 +26,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ethereum/go-ethereum"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/rawdb"
-	"github.com/ethereum/go-ethereum/core/state/snapshot"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/eth/protocols/eth"
-	"github.com/ethereum/go-ethereum/ethdb"
-	"github.com/ethereum/go-ethereum/event"
-	"github.com/ethereum/go-ethereum/trie"
+	"github.com/foreverbit/biternal"
+	"github.com/foreverbit/biternal/common"
+	"github.com/foreverbit/biternal/core/rawdb"
+	"github.com/foreverbit/biternal/core/state/snapshot"
+	"github.com/foreverbit/biternal/core/types"
+	"github.com/foreverbit/biternal/eth/protocols/eth"
+	"github.com/foreverbit/biternal/ethdb"
+	"github.com/foreverbit/biternal/event"
+	"github.com/foreverbit/biternal/trie"
 )
 
 // Reduce some of the parameters to make the tester faster.

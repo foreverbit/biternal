@@ -25,15 +25,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/consensus/ethash"
-	"github.com/ethereum/go-ethereum/console/prompt"
-	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/eth"
-	"github.com/ethereum/go-ethereum/eth/ethconfig"
-	"github.com/ethereum/go-ethereum/internal/jsre"
-	"github.com/ethereum/go-ethereum/miner"
-	"github.com/ethereum/go-ethereum/node"
+	"github.com/foreverbit/biternal/common"
+	"github.com/foreverbit/biternal/consensus/ethash"
+	"github.com/foreverbit/biternal/console/prompt"
+	"github.com/foreverbit/biternal/core"
+	"github.com/foreverbit/biternal/eth"
+	"github.com/foreverbit/biternal/eth/ethconfig"
+	"github.com/foreverbit/biternal/internal/jsre"
+	"github.com/foreverbit/biternal/miner"
+	"github.com/foreverbit/biternal/node"
 )
 
 const (

@@ -27,10 +27,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ethereum/go-ethereum/accounts"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/event"
+	"github.com/foreverbit/biternal/accounts"
+	"github.com/foreverbit/biternal/common"
+	"github.com/foreverbit/biternal/crypto"
+	"github.com/foreverbit/biternal/event"
 )
 
 var testSigData = make([]byte, 32)

@@ -21,10 +21,10 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/ethereum/go-ethereum/internal/debug"
-	"github.com/ethereum/go-ethereum/internal/flags"
-	"github.com/ethereum/go-ethereum/p2p/enode"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/foreverbit/biternal/internal/debug"
+	"github.com/foreverbit/biternal/internal/flags"
+	"github.com/foreverbit/biternal/p2p/enode"
+	"github.com/foreverbit/biternal/params"
 	"github.com/urfave/cli/v2"
 )
 

@@ -21,15 +21,15 @@ import (
 	"math/big"
 	"sync"
 
-	"github.com/ethereum/go-ethereum"
-	"github.com/ethereum/go-ethereum/accounts"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/event"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/rpc"
-	"github.com/ethereum/go-ethereum/signer/core/apitypes"
+	"github.com/foreverbit/biternal"
+	"github.com/foreverbit/biternal/accounts"
+	"github.com/foreverbit/biternal/common"
+	"github.com/foreverbit/biternal/common/hexutil"
+	"github.com/foreverbit/biternal/core/types"
+	"github.com/foreverbit/biternal/event"
+	"github.com/foreverbit/biternal/log"
+	"github.com/foreverbit/biternal/rpc"
+	"github.com/foreverbit/biternal/signer/core/apitypes"
 )
 
 type ExternalBackend struct {

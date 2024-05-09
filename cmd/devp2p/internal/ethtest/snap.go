@@ -22,12 +22,12 @@ import (
 	"fmt"
 	"math/rand"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/eth/protocols/snap"
-	"github.com/ethereum/go-ethereum/internal/utesting"
-	"github.com/ethereum/go-ethereum/light"
-	"github.com/ethereum/go-ethereum/trie"
+	"github.com/foreverbit/biternal/common"
+	"github.com/foreverbit/biternal/crypto"
+	"github.com/foreverbit/biternal/eth/protocols/snap"
+	"github.com/foreverbit/biternal/internal/utesting"
+	"github.com/foreverbit/biternal/light"
+	"github.com/foreverbit/biternal/trie"
 	"golang.org/x/crypto/sha3"
 )
 

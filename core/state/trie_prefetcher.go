@@ -19,9 +19,9 @@ package state
 import (
 	"sync"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/metrics"
+	"github.com/foreverbit/biternal/common"
+	"github.com/foreverbit/biternal/log"
+	"github.com/foreverbit/biternal/metrics"
 )
 
 var (

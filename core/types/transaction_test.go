@@ -27,9 +27,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/foreverbit/biternal/common"
+	"github.com/foreverbit/biternal/crypto"
+	"github.com/foreverbit/biternal/rlp"
 )
 
 // The values in those tests are from the Transaction Tests

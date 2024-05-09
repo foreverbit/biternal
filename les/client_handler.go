@@ -24,16 +24,16 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/mclock"
-	"github.com/ethereum/go-ethereum/core/forkid"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/eth/protocols/eth"
-	"github.com/ethereum/go-ethereum/les/downloader"
-	"github.com/ethereum/go-ethereum/light"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/p2p"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/foreverbit/biternal/common"
+	"github.com/foreverbit/biternal/common/mclock"
+	"github.com/foreverbit/biternal/core/forkid"
+	"github.com/foreverbit/biternal/core/types"
+	"github.com/foreverbit/biternal/eth/protocols/eth"
+	"github.com/foreverbit/biternal/les/downloader"
+	"github.com/foreverbit/biternal/light"
+	"github.com/foreverbit/biternal/log"
+	"github.com/foreverbit/biternal/p2p"
+	"github.com/foreverbit/biternal/params"
 )
 
 // clientHandler is responsible for receiving and processing all incoming server
