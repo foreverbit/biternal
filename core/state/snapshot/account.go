@@ -18,6 +18,7 @@ package snapshot
 
 import (
 	"bytes"
+	"github.com/foreverbit/biternal/core/types"
 	"math/big"
 
 	"github.com/foreverbit/biternal/common"
@@ -83,4 +84,25 @@ func FullAccountRLP(data []byte) ([]byte, error) {
 		return nil, err
 	}
 	return rlp.EncodeToBytes(account)
+}
+
+func FullStateAccount(data []byte) (types.StateAccount, error) {
+	account, err := FullAccount(data)
+	if err != nil {
+		return types.StateAccount{}, err
+	}
+	result := types.StateAccount{
+		Nonce:    account.Nonce,
+		Balance:  account.Balance,
+		Root:     common.BytesToHash(account.Root),
+		CodeHash: account.CodeHash,
+	}
+	if len(result.CodeHash) == 0 {
+		result.CodeHash = emptyCode.Bytes()
+	}
+	if result.Root == (common.Hash{}) {
+		result.Root = emptyRoot
+	}
+
+	return result, nil
 }

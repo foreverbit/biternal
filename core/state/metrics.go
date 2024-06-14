@@ -19,10 +19,11 @@ package state
 import "github.com/foreverbit/biternal/metrics"
 
 var (
-	accountUpdatedMeter        = metrics.NewRegisteredMeter("state/update/account", nil)
+	objectUpdatedMeter       = metrics.NewRegisteredMeter("state/update/object", nil)
+	objectDeletedMeter       = metrics.NewRegisteredMeter("state/delete/object", nil)
+	objectTrieCommittedMeter = metrics.NewRegisteredMeter("state/commit/objectnodes", nil)
+
 	storageUpdatedMeter        = metrics.NewRegisteredMeter("state/update/storage", nil)
-	accountDeletedMeter        = metrics.NewRegisteredMeter("state/delete/account", nil)
 	storageDeletedMeter        = metrics.NewRegisteredMeter("state/delete/storage", nil)
-	accountTrieCommittedMeter  = metrics.NewRegisteredMeter("state/commit/accountnodes", nil)
 	storageTriesCommittedMeter = metrics.NewRegisteredMeter("state/commit/storagenodes", nil)
 )

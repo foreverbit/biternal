@@ -49,6 +49,10 @@ func (dl *diskLayer) Root() common.Hash {
 	return dl.root
 }
 
+func (dl *diskLayer) Entity(hash common.Hash) ([]byte, error) {
+	return dl.AccountRLP(hash)
+}
+
 // Parent always returns nil as there's no layer below the disk.
 func (dl *diskLayer) Parent() snapshot {
 	return nil

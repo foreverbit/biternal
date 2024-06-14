@@ -148,34 +148,34 @@ func TestIntermediateLeaks(t *testing.T) {
 // the copy independent of each other. This test is a regression test against
 // https://github.com/foreverbit/biternal/pull/15549.
 func TestCopy(t *testing.T) {
-	// Create a random state test to copy and modify "independently"
+	// Create a random state test to cpy and modify "independently"
 	orig, _ := New(common.Hash{}, NewDatabase(rawdb.NewMemoryDatabase()), nil)
 
 	for i := byte(0); i < 255; i++ {
-		obj := orig.GetOrNewStateObject(common.BytesToAddress([]byte{i}))
-		obj.AddBalance(big.NewInt(int64(i)))
+		obj := orig.getOrNewStateObject(accountKey(common.BytesToAddress([]byte{i})))
+		getAccountObject(obj).AddBalance(big.NewInt(int64(i)))
 		orig.updateStateObject(obj)
 	}
 	orig.Finalise(false)
 
 	// Copy the state
-	copy := orig.Copy()
+	cpy := orig.Copy()
 
-	// Copy the copy state
-	ccopy := copy.Copy()
+	// Copy the cpy state
+	ccopy := cpy.Copy()
 
 	// modify all in memory
 	for i := byte(0); i < 255; i++ {
-		origObj := orig.GetOrNewStateObject(common.BytesToAddress([]byte{i}))
-		copyObj := copy.GetOrNewStateObject(common.BytesToAddress([]byte{i}))
-		ccopyObj := ccopy.GetOrNewStateObject(common.BytesToAddress([]byte{i}))
+		origObj := orig.getOrNewStateObject(accountKey(common.BytesToAddress([]byte{i})))
+		copyObj := cpy.getOrNewStateObject(accountKey(common.BytesToAddress([]byte{i})))
+		ccopyObj := ccopy.getOrNewStateObject(accountKey(common.BytesToAddress([]byte{i})))
 
-		origObj.AddBalance(big.NewInt(2 * int64(i)))
-		copyObj.AddBalance(big.NewInt(3 * int64(i)))
-		ccopyObj.AddBalance(big.NewInt(4 * int64(i)))
+		getAccountObject(origObj).AddBalance(big.NewInt(2 * int64(i)))
+		getAccountObject(copyObj).AddBalance(big.NewInt(3 * int64(i)))
+		getAccountObject(ccopyObj).AddBalance(big.NewInt(4 * int64(i)))
 
 		orig.updateStateObject(origObj)
-		copy.updateStateObject(copyObj)
+		cpy.updateStateObject(copyObj)
 		ccopy.updateStateObject(copyObj)
 	}
 
@@ -188,24 +188,24 @@ func TestCopy(t *testing.T) {
 	var wg sync.WaitGroup
 	wg.Add(3)
 	go finalise(&wg, orig)
-	go finalise(&wg, copy)
+	go finalise(&wg, cpy)
 	go finalise(&wg, ccopy)
 	wg.Wait()
 
 	// Verify that the three states have been updated independently
 	for i := byte(0); i < 255; i++ {
-		origObj := orig.GetOrNewStateObject(common.BytesToAddress([]byte{i}))
-		copyObj := copy.GetOrNewStateObject(common.BytesToAddress([]byte{i}))
-		ccopyObj := ccopy.GetOrNewStateObject(common.BytesToAddress([]byte{i}))
+		origObj := orig.getOrNewStateObject(accountKey(common.BytesToAddress([]byte{i})))
+		copyObj := cpy.getOrNewStateObject(accountKey(common.BytesToAddress([]byte{i})))
+		ccopyObj := ccopy.getOrNewStateObject(accountKey(common.BytesToAddress([]byte{i})))
 
-		if want := big.NewInt(3 * int64(i)); origObj.Balance().Cmp(want) != 0 {
-			t.Errorf("orig obj %d: balance mismatch: have %v, want %v", i, origObj.Balance(), want)
+		if want := big.NewInt(3 * int64(i)); getAccountObject(origObj).Balance().Cmp(want) != 0 {
+			t.Errorf("orig obj %d: balance mismatch: have %v, want %v", i, getAccountObject(origObj).Balance(), want)
 		}
-		if want := big.NewInt(4 * int64(i)); copyObj.Balance().Cmp(want) != 0 {
-			t.Errorf("copy obj %d: balance mismatch: have %v, want %v", i, copyObj.Balance(), want)
+		if want := big.NewInt(4 * int64(i)); getAccountObject(copyObj).Balance().Cmp(want) != 0 {
+			t.Errorf("cpy obj %d: balance mismatch: have %v, want %v", i, getAccountObject(copyObj).Balance(), want)
 		}
-		if want := big.NewInt(5 * int64(i)); ccopyObj.Balance().Cmp(want) != 0 {
-			t.Errorf("copy obj %d: balance mismatch: have %v, want %v", i, ccopyObj.Balance(), want)
+		if want := big.NewInt(5 * int64(i)); getAccountObject(ccopyObj).Balance().Cmp(want) != 0 {
+			t.Errorf("cpy obj %d: balance mismatch: have %v, want %v", i, getAccountObject(ccopyObj).Balance(), want)
 		}
 	}
 }
@@ -438,7 +438,7 @@ func (test *snapshotTest) checkEqual(state, checkstate *StateDB) error {
 			return true
 		}
 		// Check basic accessor methods.
-		checkeq("Exist", state.Exist(addr), checkstate.Exist(addr))
+		checkeq("Exist", state.Exist(accountKey(addr)), checkstate.Exist(accountKey(addr)))
 		checkeq("HasSuicided", state.HasSuicided(addr), checkstate.HasSuicided(addr))
 		checkeq("GetBalance", state.GetBalance(addr), checkstate.GetBalance(addr))
 		checkeq("GetNonce", state.GetNonce(addr), checkstate.GetNonce(addr))
@@ -446,7 +446,7 @@ func (test *snapshotTest) checkEqual(state, checkstate *StateDB) error {
 		checkeq("GetCodeHash", state.GetCodeHash(addr), checkstate.GetCodeHash(addr))
 		checkeq("GetCodeSize", state.GetCodeSize(addr), checkstate.GetCodeSize(addr))
 		// Check storage.
-		if obj := state.getStateObject(addr); obj != nil {
+		if obj := state.getStateObject(accountKey(addr)); obj != nil {
 			state.ForEachStorage(addr, func(key, value common.Hash) bool {
 				return checkeq("GetState("+key.Hex()+")", checkstate.GetState(addr, key), value)
 			})
@@ -472,7 +472,7 @@ func (test *snapshotTest) checkEqual(state, checkstate *StateDB) error {
 
 func TestTouchDelete(t *testing.T) {
 	s := newStateTest()
-	s.state.GetOrNewStateObject(common.Address{})
+	s.state.getOrNewStateObject(accountKey(common.Address{}))
 	root, _ := s.state.Commit(false)
 	s.state, _ = New(root, s.state.db, s.state.snaps)
 
@@ -690,7 +690,7 @@ func TestDeleteCreateRevert(t *testing.T) {
 	root, _ = state.Commit(true)
 	state, _ = New(root, state.db, state.snaps)
 
-	if state.getStateObject(addr) != nil {
+	if state.getStateObject(accountKey(addr)) != nil {
 		t.Fatalf("self-destructed contract came alive")
 	}
 }

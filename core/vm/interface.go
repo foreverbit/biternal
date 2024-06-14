@@ -50,12 +50,13 @@ type StateDB interface {
 	Suicide(common.Address) bool
 	HasSuicided(common.Address) bool
 
-	// Exist reports whether the given account exists in state.
+	// HasAccount reports whether the given account exists in state.
 	// Notably this should also return true for suicided accounts.
-	Exist(common.Address) bool
-	// Empty returns whether the given account is empty. Empty
+	HasAccount(common.Address) bool
+
+	// EmptyAccount returns whether the given account is empty. Empty
 	// is defined according to EIP161 (balance = nonce = code = 0).
-	Empty(common.Address) bool
+	EmptyAccount(common.Address) bool
 
 	PrepareAccessList(sender common.Address, dest *common.Address, precompiles []common.Address, txAccesses types.AccessList)
 	AddressInAccessList(addr common.Address) bool

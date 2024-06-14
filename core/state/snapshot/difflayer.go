@@ -256,6 +256,10 @@ func (dl *diffLayer) Root() common.Hash {
 	return dl.root
 }
 
+func (dl *diffLayer) Entity(hash common.Hash) ([]byte, error) {
+	return dl.AccountRLP(hash)
+}
+
 // Parent returns the subsequent layer of a diff layer.
 func (dl *diffLayer) Parent() snapshot {
 	dl.lock.RLock()

@@ -132,7 +132,7 @@ func odrContractCall(ctx context.Context, db ethdb.Database, config *params.Chai
 			statedb, err := state.New(header.Root, state.NewDatabase(db), nil)
 
 			if err == nil {
-				from := statedb.GetOrNewStateObject(bankAddr)
+				from := statedb.GetOrNewAccountObjectRef(bankAddr)
 				from.SetBalance(math.MaxBig256)
 
 				msg := callmsg{types.NewMessage(from.Address(), &testContractAddr, 0, new(big.Int), 100000, big.NewInt(params.InitialBaseFee), big.NewInt(params.InitialBaseFee), new(big.Int), data, nil, true)}

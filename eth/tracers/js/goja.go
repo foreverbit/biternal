@@ -719,7 +719,7 @@ func (do *dbObj) Exists(addrSlice goja.Value) bool {
 		return false
 	}
 	addr := common.BytesToAddress(a)
-	return do.db.Exist(addr)
+	return do.db.HasAccount(addr)
 }
 
 func (do *dbObj) setupObject() *goja.Object {

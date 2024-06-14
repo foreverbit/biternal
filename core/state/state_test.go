@@ -45,12 +45,12 @@ func TestDump(t *testing.T) {
 	s := &stateTest{db: db, state: sdb}
 
 	// generate a few entries
-	obj1 := s.state.GetOrNewStateObject(common.BytesToAddress([]byte{0x01}))
-	obj1.AddBalance(big.NewInt(22))
-	obj2 := s.state.GetOrNewStateObject(common.BytesToAddress([]byte{0x01, 0x02}))
-	obj2.SetCode(crypto.Keccak256Hash([]byte{3, 3, 3, 3, 3, 3, 3}), []byte{3, 3, 3, 3, 3, 3, 3})
-	obj3 := s.state.GetOrNewStateObject(common.BytesToAddress([]byte{0x02}))
-	obj3.SetBalance(big.NewInt(44))
+	obj1 := s.state.getOrNewStateObject(accountKey(common.BytesToAddress([]byte{0x01})))
+	getAccountObject(obj1).AddBalance(big.NewInt(22))
+	obj2 := s.state.getOrNewStateObject(accountKey(common.BytesToAddress([]byte{0x01, 0x02})))
+	getAccountObject(obj2).SetCode(crypto.Keccak256Hash([]byte{3, 3, 3, 3, 3, 3, 3}), []byte{3, 3, 3, 3, 3, 3, 3})
+	obj3 := s.state.getOrNewStateObject(accountKey(common.BytesToAddress([]byte{0x02})))
+	getAccountObject(obj3).SetBalance(big.NewInt(44))
 
 	// write some of them to the trie
 	s.state.updateStateObject(obj1)
@@ -163,27 +163,27 @@ func TestSnapshot2(t *testing.T) {
 	state.SetState(stateobjaddr1, storageaddr, data1)
 
 	// db, trie are already non-empty values
-	so0 := state.getStateObject(stateobjaddr0)
-	so0.SetBalance(big.NewInt(42))
-	so0.SetNonce(43)
-	so0.SetCode(crypto.Keccak256Hash([]byte{'c', 'a', 'f', 'e'}), []byte{'c', 'a', 'f', 'e'})
-	so0.suicided = false
-	so0.deleted = false
+	so0 := state.getStateObject(accountKey(stateobjaddr0))
+	getAccountObject(so0).SetBalance(big.NewInt(42))
+	getAccountObject(so0).SetNonce(43)
+	getAccountObject(so0).SetCode(crypto.Keccak256Hash([]byte{'c', 'a', 'f', 'e'}), []byte{'c', 'a', 'f', 'e'})
+	getAccountObject(so0).suicided = false
+	getAccountObject(so0).deleted = false
 	state.setStateObject(so0)
 
 	root, _ := state.Commit(false)
 	state, _ = New(root, state.db, state.snaps)
 
 	// and one with deleted == true
-	so1 := state.getStateObject(stateobjaddr1)
-	so1.SetBalance(big.NewInt(52))
-	so1.SetNonce(53)
-	so1.SetCode(crypto.Keccak256Hash([]byte{'c', 'a', 'f', 'e', '2'}), []byte{'c', 'a', 'f', 'e', '2'})
-	so1.suicided = true
-	so1.deleted = true
+	so1 := state.getStateObject(accountKey(stateobjaddr1))
+	getAccountObject(so1).SetBalance(big.NewInt(52))
+	getAccountObject(so1).SetNonce(53)
+	getAccountObject(so1).SetCode(crypto.Keccak256Hash([]byte{'c', 'a', 'f', 'e', '2'}), []byte{'c', 'a', 'f', 'e', '2'})
+	getAccountObject(so1).suicided = true
+	getAccountObject(so1).deleted = true
 	state.setStateObject(so1)
 
-	so1 = state.getStateObject(stateobjaddr1)
+	so1 = state.getStateObject(accountKey(stateobjaddr1))
 	if so1 != nil {
 		t.Fatalf("deleted object not nil when getting")
 	}
@@ -191,21 +191,21 @@ func TestSnapshot2(t *testing.T) {
 	snapshot := state.Snapshot()
 	state.RevertToSnapshot(snapshot)
 
-	so0Restored := state.getStateObject(stateobjaddr0)
+	so0Restored := state.getStateObject(accountKey(stateobjaddr0))
 	// Update lazily-loaded values before comparing.
-	so0Restored.GetState(state.db, storageaddr)
-	so0Restored.Code(state.db)
+	getAccountObject(so0Restored).GetState(state.db, storageaddr)
+	getAccountObject(so0Restored).Code(state.db)
 	// non-deleted is equal (restored)
-	compareStateObjects(so0Restored, so0, t)
+	compareStateObjects(getAccountObject(so0Restored), getAccountObject(so0), t)
 
 	// deleted should be nil, both before and after restore of state copy
-	so1Restored := state.getStateObject(stateobjaddr1)
+	so1Restored := state.getStateObject(accountKey(stateobjaddr1))
 	if so1Restored != nil {
 		t.Fatalf("deleted object not nil after restoring snapshot: %+v", so1Restored)
 	}
 }
 
-func compareStateObjects(so0, so1 *stateObject, t *testing.T) {
+func compareStateObjects(so0, so1 *accountObject, t *testing.T) {
 	if so0.Address() != so1.Address() {
 		t.Fatalf("Address mismatch: have %v, want %v", so0.address, so1.address)
 	}

@@ -74,7 +74,7 @@ func VerifyDAOHeaderExtraData(config *params.ChainConfig, header *types.Header) 
 // contract.
 func ApplyDAOHardFork(statedb *state.StateDB) {
 	// Retrieve the contract to refund balances into
-	if !statedb.Exist(params.DAORefundContract) {
+	if !statedb.HasAccount(params.DAORefundContract) {
 		statedb.CreateAccount(params.DAORefundContract)
 	}
 

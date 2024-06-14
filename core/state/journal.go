@@ -28,30 +28,30 @@ type journalEntry interface {
 	// revert undoes the changes introduced by this journal entry.
 	revert(*StateDB)
 
-	// dirtied returns the Ethereum address modified by this journal entry.
-	dirtied() *common.Address
+	// dirtied returns the Ethereum object hash modified by this journal entry.
+	dirtied() *common.Hash
 }
 
 // journal contains the list of state modifications applied since the last state
 // commit. These are tracked to be able to be reverted in the case of an execution
 // exception or request for reversal.
 type journal struct {
-	entries []journalEntry         // Current changes tracked by the journal
-	dirties map[common.Address]int // Dirty accounts and the number of changes
+	entries []journalEntry      // Current changes tracked by the journal
+	dirties map[common.Hash]int // Dirty accounts and the number of changes
 }
 
 // newJournal creates a new initialized journal.
 func newJournal() *journal {
 	return &journal{
-		dirties: make(map[common.Address]int),
+		dirties: make(map[common.Hash]int),
 	}
 }
 
 // append inserts a new modification entry to the end of the change journal.
 func (j *journal) append(entry journalEntry) {
 	j.entries = append(j.entries, entry)
-	if addr := entry.dirtied(); addr != nil {
-		j.dirties[*addr]++
+	if keyHash := entry.dirtied(); keyHash != nil {
+		j.dirties[*keyHash]++
 	}
 }
 
@@ -63,20 +63,20 @@ func (j *journal) revert(statedb *StateDB, snapshot int) {
 		j.entries[i].revert(statedb)
 
 		// Drop any dirty tracking induced by the change
-		if addr := j.entries[i].dirtied(); addr != nil {
-			if j.dirties[*addr]--; j.dirties[*addr] == 0 {
-				delete(j.dirties, *addr)
+		if keyHash := j.entries[i].dirtied(); keyHash != nil {
+			if j.dirties[*keyHash]--; j.dirties[*keyHash] == 0 {
+				delete(j.dirties, *keyHash)
 			}
 		}
 	}
 	j.entries = j.entries[:snapshot]
 }
 
-// dirty explicitly sets an address to dirty, even if the change entries would
+// dirty explicitly sets an object to dirty, even if the change entries would
 // otherwise suggest it as clean. This method is an ugly hack to handle the RIPEMD
 // precompile consensus exception.
-func (j *journal) dirty(addr common.Address) {
-	j.dirties[addr]++
+func (j *journal) dirty(keyHash common.Hash) {
+	j.dirties[keyHash]++
 }
 
 // length returns the current number of entries in the journal.
@@ -84,15 +84,20 @@ func (j *journal) length() int {
 	return len(j.entries)
 }
 
+// Common journal entries
 type (
-	// Changes to the account trie.
 	createObjectChange struct {
-		account *common.Address
+		key []byte // key bytes, include prefix
 	}
 	resetObjectChange struct {
-		prev         *stateObject
+		prev         stateObject
 		prevdestruct bool
 	}
+)
+
+// Account related journal entries
+type (
+	// Changes to the account trie.
 	suicideChange struct {
 		account     *common.Address
 		prev        bool // whether account had already suicided
@@ -141,35 +146,51 @@ type (
 )
 
 func (ch createObjectChange) revert(s *StateDB) {
-	delete(s.stateObjects, *ch.account)
-	delete(s.stateObjectsDirty, *ch.account)
+	keyHash := s.hashKey(ch.key)
+
+	delete(s.stateObjects, keyHash)
+	delete(s.stateObjectsDirty, keyHash)
 }
 
-func (ch createObjectChange) dirtied() *common.Address {
-	return ch.account
+func (ch createObjectChange) dirtied() *common.Hash {
+	stateType := stateTypeFromPrefix(ch.key[0])
+	switch stateType {
+	case AccountState:
+		addr := common.BytesToAddress(ch.key[1:])
+		keyHash := accountKeyHash(addr)
+		return &keyHash
+	case PodState:
+		block := keyToBlock(ch.key[1:])
+		keyHash := podKeyHash(block)
+		return &keyHash
+	default:
+		return nil
+	}
 }
 
 func (ch resetObjectChange) revert(s *StateDB) {
 	s.setStateObject(ch.prev)
 	if !ch.prevdestruct && s.snap != nil {
-		delete(s.snapDestructs, ch.prev.addrHash)
+		delete(s.snapDestructs, ch.prev.KeyHash())
 	}
 }
 
-func (ch resetObjectChange) dirtied() *common.Address {
+func (ch resetObjectChange) dirtied() *common.Hash {
 	return nil
 }
 
 func (ch suicideChange) revert(s *StateDB) {
-	obj := s.getStateObject(*ch.account)
+	obj := s.getStateObject(accountKey(*ch.account))
 	if obj != nil {
-		obj.suicided = ch.prev
-		obj.setBalance(ch.prevbalance)
+		ao := getAccountObject(obj)
+		ao.suicided = ch.prev
+		ao.setBalance(ch.prevbalance)
 	}
 }
 
-func (ch suicideChange) dirtied() *common.Address {
-	return ch.account
+func (ch suicideChange) dirtied() *common.Hash {
+	keyHash := accountKeyHash(*ch.account)
+	return &keyHash
 }
 
 var ripemd = common.HexToAddress("0000000000000000000000000000000000000003")
@@ -177,47 +198,56 @@ var ripemd = common.HexToAddress("0000000000000000000000000000000000000003")
 func (ch touchChange) revert(s *StateDB) {
 }
 
-func (ch touchChange) dirtied() *common.Address {
-	return ch.account
+func (ch touchChange) dirtied() *common.Hash {
+	keyHash := accountKeyHash(*ch.account)
+	return &keyHash
 }
 
 func (ch balanceChange) revert(s *StateDB) {
-	s.getStateObject(*ch.account).setBalance(ch.prev)
+	obj := s.getStateObject(accountKey(*ch.account))
+	getAccountObject(obj).setBalance(ch.prev)
 }
 
-func (ch balanceChange) dirtied() *common.Address {
-	return ch.account
+func (ch balanceChange) dirtied() *common.Hash {
+	keyHash := accountKeyHash(*ch.account)
+	return &keyHash
 }
 
 func (ch nonceChange) revert(s *StateDB) {
-	s.getStateObject(*ch.account).setNonce(ch.prev)
+	obj := s.getStateObject(accountKey(*ch.account))
+	getAccountObject(obj).setNonce(ch.prev)
 }
 
-func (ch nonceChange) dirtied() *common.Address {
-	return ch.account
+func (ch nonceChange) dirtied() *common.Hash {
+	keyHash := accountKeyHash(*ch.account)
+	return &keyHash
 }
 
 func (ch codeChange) revert(s *StateDB) {
-	s.getStateObject(*ch.account).setCode(common.BytesToHash(ch.prevhash), ch.prevcode)
+	obj := s.getStateObject(accountKey(*ch.account))
+	getAccountObject(obj).setCode(common.BytesToHash(ch.prevhash), ch.prevcode)
 }
 
-func (ch codeChange) dirtied() *common.Address {
-	return ch.account
+func (ch codeChange) dirtied() *common.Hash {
+	keyHash := accountKeyHash(*ch.account)
+	return &keyHash
 }
 
 func (ch storageChange) revert(s *StateDB) {
-	s.getStateObject(*ch.account).setState(ch.key, ch.prevalue)
+	obj := s.getStateObject(accountKey(*ch.account))
+	getAccountObject(obj).setState(ch.key, ch.prevalue)
 }
 
-func (ch storageChange) dirtied() *common.Address {
-	return ch.account
+func (ch storageChange) dirtied() *common.Hash {
+	keyHash := accountKeyHash(*ch.account)
+	return &keyHash
 }
 
 func (ch refundChange) revert(s *StateDB) {
 	s.refund = ch.prev
 }
 
-func (ch refundChange) dirtied() *common.Address {
+func (ch refundChange) dirtied() *common.Hash {
 	return nil
 }
 
@@ -231,7 +261,7 @@ func (ch addLogChange) revert(s *StateDB) {
 	s.logSize--
 }
 
-func (ch addLogChange) dirtied() *common.Address {
+func (ch addLogChange) dirtied() *common.Hash {
 	return nil
 }
 
@@ -239,7 +269,7 @@ func (ch addPreimageChange) revert(s *StateDB) {
 	delete(s.preimages, ch.hash)
 }
 
-func (ch addPreimageChange) dirtied() *common.Address {
+func (ch addPreimageChange) dirtied() *common.Hash {
 	return nil
 }
 
@@ -256,7 +286,7 @@ func (ch accessListAddAccountChange) revert(s *StateDB) {
 	s.accessList.DeleteAddress(*ch.address)
 }
 
-func (ch accessListAddAccountChange) dirtied() *common.Address {
+func (ch accessListAddAccountChange) dirtied() *common.Hash {
 	return nil
 }
 
@@ -264,6 +294,6 @@ func (ch accessListAddSlotChange) revert(s *StateDB) {
 	s.accessList.DeleteSlot(*ch.address, *ch.slot)
 }
 
-func (ch accessListAddSlotChange) dirtied() *common.Address {
+func (ch accessListAddSlotChange) dirtied() *common.Hash {
 	return nil
 }

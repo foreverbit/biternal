@@ -50,7 +50,7 @@ func accountRangeTest(t *testing.T, trie *state.Trie, statedb *state.StateDB, st
 		if address == (common.Address{}) {
 			t.Fatalf("empty address returned")
 		}
-		if !statedb.Exist(address) {
+		if !statedb.HasAccount(address) {
 			t.Fatalf("account not found in state %s", address.Hex())
 		}
 	}
