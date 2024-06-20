@@ -26,7 +26,6 @@ import (
 type stateObject interface {
 	Type() StateType
 	Key() []byte
-	Data() interface{}
 	KeyHash() common.Hash
 	ValueBytes() ([]byte, error)
 	DeepCopy(s *StateDB) stateObject
@@ -54,12 +53,12 @@ func getAccountObject(so stateObject) *accountObject {
 	if so.Type() != AccountState {
 		return nil
 	}
-	return so.Data().(*accountObject)
+	return so.(*accountObject)
 }
 
 func getPodObject(so stateObject) *podObject {
 	if so.Type() != PodState {
 		return nil
 	}
-	return so.Data().(*podObject)
+	return so.(*podObject)
 }

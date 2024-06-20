@@ -394,6 +394,10 @@ func (g Alloc) OnAccount(addr common.Address, dumpAccount state.DumpAccount) {
 	g[addr] = genesisAccount
 }
 
+func (g Alloc) OnPod(*big.Int, state.DumpPod) {
+	// We don't care about the pods
+}
+
 // saveFile marshalls the object to the given file
 func saveFile(baseDir, filename string, data interface{}) error {
 	b, err := json.MarshalIndent(data, "", " ")

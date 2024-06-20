@@ -60,10 +60,6 @@ func (o *podObject) Key() []byte {
 	return podKey(o.block)
 }
 
-func (o *podObject) Data() interface{} {
-	return o
-}
-
 func (o *podObject) ValueBytes() ([]byte, error) {
 	return rlp.EncodeToBytes(o.data)
 }

@@ -533,7 +533,7 @@ func (s *accountObject) Nonce() uint64 {
 	return s.data.Nonce
 }
 
-// Never called, but must be present to allow stateObject to be used
+// Value Never called, but must be present to allow stateObject to be used
 // as a vm.Account interface that also satisfies the vm.ContractRef
 // interface. Interfaces are awesome.
 func (s *accountObject) Value() *big.Int {
@@ -548,10 +548,6 @@ func (o *accountObject) Type() StateType {
 
 func (o *accountObject) Key() []byte {
 	return accountKey(o.address)
-}
-
-func (o *accountObject) Data() interface{} {
-	return o
 }
 
 func (o *accountObject) ValueBytes() ([]byte, error) {

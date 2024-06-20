@@ -19,6 +19,7 @@ package state
 import (
 	"encoding/json"
 	"fmt"
+	"math/big"
 	"time"
 
 	"github.com/foreverbit/biternal/common"
@@ -31,6 +32,7 @@ import (
 
 // DumpConfig is a set of options to control what portions of the statewill be
 // iterated and collected.
+// TODO, Need config for pod?
 type DumpConfig struct {
 	SkipCode          bool
 	SkipStorage       bool
@@ -45,6 +47,8 @@ type DumpCollector interface {
 	OnRoot(common.Hash)
 	// OnAccount is called once for each account in the trie
 	OnAccount(common.Address, DumpAccount)
+	// OnPod is called once for each pod in the trie
+	OnPod(*big.Int, DumpPod)
 }
 
 // DumpAccount represents an account in the state.
@@ -59,10 +63,20 @@ type DumpAccount struct {
 	SecureKey hexutil.Bytes          `json:"key,omitempty"`     // If we don't have address, we can output the key
 }
 
+// DumpPod represents a pod in the state.
+type DumpPod struct {
+	GasLimit        uint64            `json:"gasLimit"`
+	CurrentGasLimit uint64            `json:"currentGasLimit"`
+	Passengers      []*common.Address `json:"passengers"`
+	Block           *big.Int          `json:"block,omitempty"`
+	SecureKey       hexutil.Bytes     `json:"key,omitempty"`
+}
+
 // Dump represents the full dump in a collected format, as one large map.
 type Dump struct {
 	Root     string                         `json:"root"`
 	Accounts map[common.Address]DumpAccount `json:"accounts"`
+	Pods     map[*big.Int]DumpPod           `json:"pods"`
 }
 
 // OnRoot implements DumpCollector interface
@@ -75,11 +89,16 @@ func (d *Dump) OnAccount(addr common.Address, account DumpAccount) {
 	d.Accounts[addr] = account
 }
 
+func (d *Dump) OnPod(block *big.Int, pod DumpPod) {
+	d.Pods[block] = pod
+}
+
 // IteratorDump is an implementation for iterating over data.
 type IteratorDump struct {
 	Root     string                         `json:"root"`
 	Accounts map[common.Address]DumpAccount `json:"accounts"`
-	Next     []byte                         `json:"next,omitempty"` // nil if no more accounts
+	Pods     map[*big.Int]DumpPod           `json:"pods"`
+	Next     []byte                         `json:"next,omitempty"` // nil if no more objects
 }
 
 // OnRoot implements DumpCollector interface
@@ -90,6 +109,11 @@ func (d *IteratorDump) OnRoot(root common.Hash) {
 // OnAccount implements DumpCollector interface
 func (d *IteratorDump) OnAccount(addr common.Address, account DumpAccount) {
 	d.Accounts[addr] = account
+}
+
+// OnPod implements DumpCollector interface
+func (d *IteratorDump) OnPod(block *big.Int, pod DumpPod) {
+	d.Pods[block] = pod
 }
 
 // iterativeDump is a DumpCollector-implementation which dumps output line-by-line iteratively.
@@ -113,6 +137,17 @@ func (d iterativeDump) OnAccount(addr common.Address, account DumpAccount) {
 		dumpAccount.Address = &addr
 	}
 	d.Encode(dumpAccount)
+}
+
+func (d iterativeDump) OnPod(block *big.Int, pod DumpPod) {
+	dumpPod := &DumpPod{
+		GasLimit:        pod.GasLimit,
+		CurrentGasLimit: pod.CurrentGasLimit,
+		Passengers:      pod.Passengers,
+		Block:           block,
+		SecureKey:       pod.SecureKey,
+	}
+	d.Encode(dumpPod)
 }
 
 // OnRoot implements DumpCollector interface
