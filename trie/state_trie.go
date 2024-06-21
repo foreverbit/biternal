@@ -18,22 +18,11 @@ package trie
 
 import (
 	"fmt"
-
 	"github.com/foreverbit/biternal/common"
 	"github.com/foreverbit/biternal/core/types"
 	"github.com/foreverbit/biternal/log"
 	"github.com/foreverbit/biternal/rlp"
 )
-
-// SecureTrie is the old name of StateTrie.
-// Deprecated: use StateTrie.
-type SecureTrie = StateTrie
-
-// NewSecure creates a new StateTrie.
-// Deprecated: use NewStateTrie.
-func NewSecure(owner common.Hash, root common.Hash, db *Database) (*SecureTrie, error) {
-	return NewStateTrie(owner, root, db)
-}
 
 // StateTrie wraps a trie with key hashing. In a secure trie, all
 // access operations hash the key using keccak256. This prevents
@@ -52,6 +41,8 @@ type StateTrie struct {
 	secKeyCache      map[string][]byte
 	secKeyCacheOwner *StateTrie // Pointer to self, replace the key cache on mismatch
 }
+
+var stateAccountPrefix = []byte{'a'}
 
 // NewStateTrie creates a trie with an existing root node from a backing database
 // and optional intermediate in-memory node pool.
@@ -102,7 +93,8 @@ func (t *StateTrie) TryGetAccount(key []byte) (*types.StateAccount, error) {
 	if res == nil {
 		return nil, nil
 	}
-	err = rlp.DecodeBytes(res, &ret)
+	value := res[1:]
+	err = rlp.DecodeBytes(value, &ret)
 	return &ret, err
 }
 
@@ -119,7 +111,8 @@ func (t *StateTrie) TryGetAccountWithPreHashedKey(key []byte) (*types.StateAccou
 	if res == nil {
 		return nil, nil
 	}
-	err = rlp.DecodeBytes(res, &ret)
+	value := res[1:]
+	err = rlp.DecodeBytes(value, &ret)
 	return &ret, err
 }
 
@@ -129,14 +122,14 @@ func (t *StateTrie) TryGetNode(path []byte) ([]byte, int, error) {
 	return t.trie.TryGetNode(path)
 }
 
-// TryUpdateAccount account will abstract the write of an account to the
-// secure trie.
+// TryUpdateAccount account will abstract to write of an account to the secure trie.
 func (t *StateTrie) TryUpdateAccount(key []byte, acc *types.StateAccount) error {
 	hk := t.hashKey(key)
 	data, err := rlp.EncodeToBytes(acc)
 	if err != nil {
 		return err
 	}
+	data = append(stateAccountPrefix, data...)
 	if err := t.trie.TryUpdate(hk, data); err != nil {
 		return err
 	}

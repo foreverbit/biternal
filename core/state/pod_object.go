@@ -61,7 +61,12 @@ func (o *podObject) Key() []byte {
 }
 
 func (o *podObject) ValueBytes() ([]byte, error) {
-	return rlp.EncodeToBytes(o.data)
+	// with prefix
+	value, err := rlp.EncodeToBytes(o.data)
+	if err != nil {
+		return nil, err
+	}
+	return append([]byte{PodState.Prefix}, value...), nil
 }
 
 func (o *podObject) KeyHash() common.Hash {

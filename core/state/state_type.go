@@ -21,6 +21,8 @@ import (
 	"math/big"
 )
 
+// StateType prefix for key is to differentiate between different types of state
+// for value is to identify state type from trie scan
 type StateType struct {
 	Prefix byte // One prefix for key and {value}
 }
@@ -37,17 +39,13 @@ func stateTypeFromPrefix(prefix byte) StateType {
 	case 'p':
 		return PodState
 	default:
-		panic("unknown state type")
+		panic("unknown state type with prefix")
 	}
 }
 
 // PreKey Key before hash
 func (st StateType) PreKey(key []byte) []byte {
 	return append([]byte{st.Prefix}, key...)
-}
-
-func (st StateType) Value(value []byte) []byte {
-	return append([]byte{st.Prefix}, value...)
 }
 
 func accountKey(addr common.Address) []byte {

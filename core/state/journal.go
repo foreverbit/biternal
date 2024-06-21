@@ -160,7 +160,7 @@ func (ch createObjectChange) dirtied() *common.Hash {
 		keyHash := accountKeyHash(addr)
 		return &keyHash
 	case PodState:
-		block := keyToBlock(ch.key[1:])
+		block := new(big.Int).SetBytes(ch.key[1:])
 		keyHash := podKeyHash(block)
 		return &keyHash
 	default:

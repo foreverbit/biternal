@@ -27,16 +27,17 @@ import (
 )
 
 // NodeIterator is an iterator to traverse the entire state trie post-order,
-// including all of the contract code and contract state tries.
+// including all the contract code and contract state tries.
 type NodeIterator struct {
 	state *StateDB // State being iterated
 
 	stateIt trie.NodeIterator // Primary iterator for the global state trie
 	dataIt  trie.NodeIterator // Secondary iterator for the data trie of a contract
 
-	accountHash common.Hash // Hash of the node containing the account
-	codeHash    common.Hash // Hash of the contract source code
-	code        []byte      // Source code associated with a contract
+	objectHash common.Hash // Hash of the node containing the object, generic for account and pod
+
+	codeHash common.Hash // Hash of the contract source code
+	code     []byte      // Source code associated with a contract
 
 	Hash   common.Hash // Hash of the current entry being iterated (nil if not standalone)
 	Parent common.Hash // Hash of the first full ancestor node (nil if current is the root)
@@ -44,7 +45,7 @@ type NodeIterator struct {
 	Error error // Failure set in case of an internal error in the iterator
 }
 
-// NewNodeIterator creates an post-order state node iterator.
+// NewNodeIterator creates a post-order state node iterator.
 func NewNodeIterator(state *StateDB) *NodeIterator {
 	return &NodeIterator{
 		state: state,
@@ -104,28 +105,43 @@ func (it *NodeIterator) step() error {
 	if !it.stateIt.Leaf() {
 		return nil
 	}
-	// Otherwise we've reached an account node, initiate data iteration
-	var account types.StateAccount
-	if err := rlp.Decode(bytes.NewReader(it.stateIt.LeafBlob()), &account); err != nil {
-		return err
-	}
-	dataTrie, err := it.state.db.OpenStorageTrie(common.BytesToHash(it.stateIt.LeafKey()), account.Root)
-	if err != nil {
-		return err
-	}
-	it.dataIt = dataTrie.NodeIterator(nil)
-	if !it.dataIt.Next(true) {
-		it.dataIt = nil
-	}
-	if !bytes.Equal(account.CodeHash, emptyCodeHash) {
-		it.codeHash = common.BytesToHash(account.CodeHash)
-		addrHash := common.BytesToHash(it.stateIt.LeafKey())
-		it.code, err = it.state.db.ContractCode(addrHash, common.BytesToHash(account.CodeHash))
-		if err != nil {
-			return fmt.Errorf("code %x: %v", account.CodeHash, err)
+
+	nodeBlob := it.stateIt.LeafBlob()
+	stateType := stateTypeFromPrefix(nodeBlob[0])
+	switch stateType {
+	case AccountState:
+		var account types.StateAccount
+		if err := rlp.Decode(bytes.NewReader(nodeBlob[1:]), &account); err != nil {
+			return err
 		}
+		dataTrie, err := it.state.db.OpenStorageTrie(common.BytesToHash(it.stateIt.LeafKey()), account.Root)
+		if err != nil {
+			return err
+		}
+		it.dataIt = dataTrie.NodeIterator(nil)
+		if !it.dataIt.Next(true) {
+			it.dataIt = nil
+		}
+		if !bytes.Equal(account.CodeHash, emptyCodeHash) {
+			it.codeHash = common.BytesToHash(account.CodeHash)
+			addrHash := common.BytesToHash(it.stateIt.LeafKey())
+			it.code, err = it.state.db.ContractCode(addrHash, common.BytesToHash(account.CodeHash))
+			if err != nil {
+				return fmt.Errorf("code %x: %v", account.CodeHash, err)
+			}
+		}
+		break
+	case PodState:
+		var pod types.StatePod
+		if err := rlp.Decode(bytes.NewReader(nodeBlob[1:]), &pod); err != nil {
+			return err
+		}
+		break
+	default:
+		return fmt.Errorf("invalid state type: %d", stateType)
 	}
-	it.accountHash = it.stateIt.Parent()
+
+	it.objectHash = it.stateIt.Parent()
 	return nil
 }
 
@@ -144,10 +160,10 @@ func (it *NodeIterator) retrieve() bool {
 	case it.dataIt != nil:
 		it.Hash, it.Parent = it.dataIt.Hash(), it.dataIt.Parent()
 		if it.Parent == (common.Hash{}) {
-			it.Parent = it.accountHash
+			it.Parent = it.objectHash
 		}
 	case it.code != nil:
-		it.Hash, it.Parent = it.codeHash, it.accountHash
+		it.Hash, it.Parent = it.codeHash, it.objectHash
 	case it.stateIt != nil:
 		it.Hash, it.Parent = it.stateIt.Hash(), it.stateIt.Parent()
 	}

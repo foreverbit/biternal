@@ -455,7 +455,7 @@ func (s *accountObject) deepCopy(db *StateDB) *accountObject {
 // Attribute accessors
 //
 
-// Returns the address of the contract/account
+// Address Returns the address of the contract/account
 func (s *accountObject) Address() common.Address {
 	return s.address
 }
@@ -551,7 +551,12 @@ func (o *accountObject) Key() []byte {
 }
 
 func (o *accountObject) ValueBytes() ([]byte, error) {
-	return rlp.EncodeToBytes(o.data)
+	// with prefix
+	value, err := rlp.EncodeToBytes(o.data)
+	if err != nil {
+		return nil, err
+	}
+	return append([]byte{AccountState.Prefix}, value...), nil
 }
 
 func (o *accountObject) KeyHash() common.Hash {

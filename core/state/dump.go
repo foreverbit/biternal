@@ -32,7 +32,6 @@ import (
 
 // DumpConfig is a set of options to control what portions of the statewill be
 // iterated and collected.
-// TODO, Need config for pod?
 type DumpConfig struct {
 	SkipCode          bool
 	SkipStorage       bool
@@ -65,11 +64,11 @@ type DumpAccount struct {
 
 // DumpPod represents a pod in the state.
 type DumpPod struct {
-	GasLimit        uint64            `json:"gasLimit"`
-	CurrentGasLimit uint64            `json:"currentGasLimit"`
-	Passengers      []*common.Address `json:"passengers"`
-	Block           *big.Int          `json:"block,omitempty"`
-	SecureKey       hexutil.Bytes     `json:"key,omitempty"`
+	GasLimit        uint64           `json:"gasLimit"`
+	CurrentGasLimit uint64           `json:"currentGasLimit"`
+	Passengers      []common.Address `json:"passengers"`
+	Block           *big.Int         `json:"block,omitempty"`
+	SecureKey       hexutil.Bytes    `json:"key,omitempty"`
 }
 
 // Dump represents the full dump in a collected format, as one large map.
@@ -167,6 +166,7 @@ func (s *StateDB) DumpToCollector(c DumpCollector, conf *DumpConfig) (nextKey []
 	var (
 		missingPreimages int
 		accounts         uint64
+		pods             uint64
 		start            = time.Now()
 		logged           = time.Now()
 	)
@@ -175,50 +175,83 @@ func (s *StateDB) DumpToCollector(c DumpCollector, conf *DumpConfig) (nextKey []
 
 	it := trie.NewIterator(s.trie.NodeIterator(conf.Start))
 	for it.Next() {
-		var data types.StateAccount
-		if err := rlp.DecodeBytes(it.Value, &data); err != nil {
-			panic(err)
-		}
-		account := DumpAccount{
-			Balance:   data.Balance.String(),
-			Nonce:     data.Nonce,
-			Root:      data.Root[:],
-			CodeHash:  data.CodeHash,
-			SecureKey: it.Key,
-		}
-		addrBytes := s.trie.GetKey(it.Key)
-		if addrBytes == nil {
-			// Preimage missing
-			missingPreimages++
-			if conf.OnlyWithAddresses {
-				continue
+		value := it.Value
+		stateType := stateTypeFromPrefix(value[0])
+		value = value[1:]
+
+		switch stateType {
+		case AccountState:
+			var data types.StateAccount
+			if err := rlp.DecodeBytes(value, &data); err != nil {
+				panic(err)
 			}
-			account.SecureKey = it.Key
-		}
-		addr := common.BytesToAddress(addrBytes)
-		obj := newAccountObject(s, addr, data)
-		if !conf.SkipCode {
-			account.Code = obj.Code(s.db)
-		}
-		if !conf.SkipStorage {
-			account.Storage = make(map[common.Hash]string)
-			storageIt := trie.NewIterator(obj.getTrie(s.db).NodeIterator(nil))
-			for storageIt.Next() {
-				_, content, _, err := rlp.Split(storageIt.Value)
-				if err != nil {
-					log.Error("Failed to decode the value returned by iterator", "error", err)
+			account := DumpAccount{
+				Balance:   data.Balance.String(),
+				Nonce:     data.Nonce,
+				Root:      data.Root[:],
+				CodeHash:  data.CodeHash,
+				SecureKey: it.Key,
+			}
+			addrBytes := s.trie.GetKey(it.Key)
+			if addrBytes == nil {
+				// Preimage missing
+				missingPreimages++
+				if conf.OnlyWithAddresses {
 					continue
 				}
-				account.Storage[common.BytesToHash(s.trie.GetKey(storageIt.Key))] = common.Bytes2Hex(content)
 			}
+			// TODO: what if addrBytes is nil?
+			addr := common.BytesToAddress(addrBytes[1:])
+			obj := newAccountObject(s, addr, data)
+			if !conf.SkipCode {
+				account.Code = obj.Code(s.db)
+			}
+			if !conf.SkipStorage {
+				account.Storage = make(map[common.Hash]string)
+				storageIt := trie.NewIterator(obj.getTrie(s.db).NodeIterator(nil))
+				for storageIt.Next() {
+					_, content, _, err := rlp.Split(storageIt.Value)
+					if err != nil {
+						log.Error("Failed to decode the value returned by iterator", "error", err)
+						continue
+					}
+					account.Storage[common.BytesToHash(s.trie.GetKey(storageIt.Key))] = common.Bytes2Hex(content)
+				}
+			}
+			c.OnAccount(addr, account)
+			accounts++
+			break
+		case PodState:
+			var data types.StatePod
+			if err := rlp.DecodeBytes(value, &data); err != nil {
+				panic(err)
+			}
+			pod := DumpPod{
+				GasLimit:        data.GasLimit,
+				CurrentGasLimit: data.CurrentGasLimit,
+				Passengers:      data.Passengers,
+				SecureKey:       it.Key,
+			}
+			blockBytes := s.trie.GetKey(it.Key)
+			if blockBytes == nil {
+				// Preimage missing
+				missingPreimages++
+			}
+			// TODO: what if blockBytes is nil?
+			block := new(big.Int).SetBytes(blockBytes[1:])
+			c.OnPod(block, pod)
+			pods++
+			break
+		default:
+			panic("unknown state type in dump trie")
 		}
-		c.OnAccount(addr, account)
-		accounts++
+
 		if time.Since(logged) > 8*time.Second {
-			log.Info("Trie dumping in progress", "at", it.Key, "accounts", accounts,
+			log.Info("Trie dumping in progress", "at", it.Key, "accounts", accounts, "pods", pods,
 				"elapsed", common.PrettyDuration(time.Since(start)))
 			logged = time.Now()
 		}
+		// TODO include pod max config
 		if conf.Max > 0 && accounts >= conf.Max {
 			if it.Next() {
 				nextKey = it.Key
@@ -229,16 +262,17 @@ func (s *StateDB) DumpToCollector(c DumpCollector, conf *DumpConfig) (nextKey []
 	if missingPreimages > 0 {
 		log.Warn("Dump incomplete due to missing preimages", "missing", missingPreimages)
 	}
-	log.Info("Trie dumping complete", "accounts", accounts,
+	log.Info("Trie dumping complete", "accounts", accounts, "pods", pods,
 		"elapsed", common.PrettyDuration(time.Since(start)))
 
 	return nextKey
 }
 
-// RawDump returns the entire state an a single large object
+// RawDump returns the entire state a single large object
 func (s *StateDB) RawDump(opts *DumpConfig) Dump {
 	dump := &Dump{
 		Accounts: make(map[common.Address]DumpAccount),
+		Pods:     make(map[*big.Int]DumpPod),
 	}
 	s.DumpToCollector(dump, opts)
 	return *dump
@@ -247,22 +281,23 @@ func (s *StateDB) RawDump(opts *DumpConfig) Dump {
 // Dump returns a JSON string representing the entire state as a single json-object
 func (s *StateDB) Dump(opts *DumpConfig) []byte {
 	dump := s.RawDump(opts)
-	json, err := json.MarshalIndent(dump, "", "    ")
+	result, err := json.MarshalIndent(dump, "", "    ")
 	if err != nil {
 		fmt.Println("Dump err", err)
 	}
-	return json
+	return result
 }
 
-// IterativeDump dumps out accounts as json-objects, delimited by linebreaks on stdout
+// IterativeDump dumps out accounts/pods as json-objects, delimited by linebreaks on stdout
 func (s *StateDB) IterativeDump(opts *DumpConfig, output *json.Encoder) {
 	s.DumpToCollector(iterativeDump{output}, opts)
 }
 
-// IteratorDump dumps out a batch of accounts starts with the given start key
+// IteratorDump dumps out a batch of accounts/pod starts with the given start key
 func (s *StateDB) IteratorDump(opts *DumpConfig) IteratorDump {
 	iterator := &IteratorDump{
 		Accounts: make(map[common.Address]DumpAccount),
+		Pods:     make(map[*big.Int]DumpPod),
 	}
 	iterator.Next = s.DumpToCollector(iterator, opts)
 	return *iterator

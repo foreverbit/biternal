@@ -341,7 +341,7 @@ func (s *StateDB) GetState(addr common.Address, hash common.Hash) common.Hash {
 
 // GetProof returns the Merkle proof for a given account.
 func (s *StateDB) GetProof(addr common.Address) ([][]byte, error) {
-	return s.GetProofByHash(crypto.Keccak256Hash(accountKey(addr)))
+	return s.GetProofByHash(s.hashKey(accountKey(addr)))
 }
 
 // GetProofByHash returns the Merkle proof for a given account.
@@ -582,7 +582,10 @@ func (s *StateDB) getDeletedStateObject(key []byte) stateObject {
 		}
 	}
 
-	stateType := stateTypeFromPrefix(key[0])
+	// conclude state from data prefix
+	stateType := stateTypeFromPrefix(data[0])
+	data = data[1:]
+
 	var obj stateObject
 	switch stateType {
 	case AccountState:

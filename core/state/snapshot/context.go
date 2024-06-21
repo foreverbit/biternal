@@ -32,6 +32,7 @@ import (
 
 const (
 	snapAccount = "account" // Identifier of account snapshot generation
+	snapPod     = "pod"     // Identifier of pod snapshot generation
 	snapStorage = "storage" // Identifier of storage snapshot generation
 )
 
@@ -41,6 +42,7 @@ type generatorStats struct {
 	origin   uint64             // Origin prefix where generation started
 	start    time.Time          // Timestamp when generation started
 	accounts uint64             // Number of accounts indexed(generated or recovered)
+	pods     uint64             // Number of pods indexed(generated or recovered)
 	slots    uint64             // Number of storage slots indexed(generated or recovered)
 	dangling uint64             // Number of dangling storage slots
 	storage  common.StorageSize // Total account and storage slot size(generation or recovery)
@@ -66,6 +68,7 @@ func (gs *generatorStats) Log(msg string, root common.Hash, marker []byte) {
 	// Add the usual measurements
 	ctx = append(ctx, []interface{}{
 		"accounts", gs.accounts,
+		"pods", gs.pods,
 		"slots", gs.slots,
 		"storage", gs.storage,
 		"dangling", gs.dangling,
@@ -85,6 +88,7 @@ func (gs *generatorStats) Log(msg string, root common.Hash, marker []byte) {
 	log.Info(msg, ctx...)
 }
 
+// TODO add support for pod
 // generatorContext carries a few global values to be shared by all generation functions.
 type generatorContext struct {
 	stats   *generatorStats     // Generation statistic collection
